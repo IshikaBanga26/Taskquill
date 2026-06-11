@@ -22,6 +22,9 @@ function Dashboard() {
     return 'Good evening'
   }
 
+  const pendingCount = tasks.filter(t => t.status === 'pending').length
+  const completedCount = tasks.filter(t => t.status === 'completed').length
+
   const handleAdd = async () => {
     if (!title.trim()) return
     await addTask(title, description)
@@ -86,13 +89,14 @@ function Dashboard() {
           </div>
 
           <div className="add-task-box">
-            <p className="section-label">New Task</p>
             <input
               type="text"
               placeholder="Task title"
               value={title}
+              maxLength={60}
               onChange={(e) => setTitle(e.target.value)}
             />
+            <p className="char-count">{title.length}/60</p>
             <input
               type="text"
               placeholder="Description (optional)"
@@ -104,6 +108,20 @@ function Dashboard() {
         </aside>
 
         <main className="main-panel">
+          {tasks.length > 0 && (
+            <div className="progress-wrap">
+              <div className="progress-top">
+                <span>Today's progress</span>
+                <span>{completedCount}/{tasks.length} done</span>
+              </div>
+              <div className="progress-track">
+                <div
+                  className="progress-fill"
+                  style={{ width: `${Math.round((completedCount / tasks.length) * 100)}%` }}
+                />
+              </div>
+            </div>
+          )}
           <div className="controls">
             <input
               type="text"
@@ -113,15 +131,15 @@ function Dashboard() {
               className="search-input"
             />
             <div className="filter-btns">
-              {['all', 'pending', 'completed'].map(f => (
-                <button
-                  key={f}
-                  className={filter === f ? 'active' : ''}
-                  onClick={() => setFilter(f)}
-                >
-                  {f}
-                </button>
-              ))}
+              <button className={filter === 'all' ? 'active' : ''} onClick={() => setFilter('all')}>
+                All ({tasks.length})
+              </button>
+              <button className={filter === 'pending' ? 'active' : ''} onClick={() => setFilter('pending')}>
+                Pending ({pendingCount})
+              </button>
+              <button className={filter === 'completed' ? 'active' : ''} onClick={() => setFilter('completed')}>
+                Completed ({completedCount})
+              </button>
             </div>
           </div>
 
